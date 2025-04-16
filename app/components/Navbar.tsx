@@ -7,13 +7,13 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 w-full py-3 px-7 border-b border-gray-100 shadow-sm bg-white z-10">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link
-          href="/crear"
+          href="/"
           className="text-xl font-medium text-gray-800 hover:text-gray-600 transition"
         >
           post-it
         </Link>
         <Link
-          href="/"
+          href="/posts"
           className="text-sm text-gray-600 hover:text-gray-800 transition"
         >
           posts
