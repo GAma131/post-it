@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import "../styles/textarea.css";
 
@@ -10,6 +10,14 @@ export default function CrearPost() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const router = useRouter();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // Establecer el foco en el textarea al cargar la página
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
 
   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTagInput(e.target.value);
@@ -38,11 +46,15 @@ export default function CrearPost() {
       <form className="flex-1 flex flex-col p-6 w-full h-full">
         <div className="editor-container">
           <textarea
+            ref={textareaRef}
             placeholder="Write anything you want"
             value={contenido}
             onChange={(e) => setContenido(e.target.value)}
             className="full-textarea text-lg shadow-lg scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: '#E5E7EB transparent' }}
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#E5E7EB transparent",
+            }}
           />
 
           <div className="flex flex-col mt-4">
