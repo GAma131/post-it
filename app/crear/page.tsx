@@ -42,8 +42,8 @@ export default function CrearPost() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <form className="flex-1 flex flex-col p-6 w-full h-full">
+    <div className="h-[calc(100vh-56px)] flex flex-col">
+      <form className="flex flex-col pt-1 px-6 w-full">
         <div className="editor-container">
           <textarea
             ref={textareaRef}
