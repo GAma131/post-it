@@ -1,5 +1,5 @@
 .full-textarea {
-  height: calc(100vh - 200px) !important; /* Ajustado para reducir el espacio */
+  height: calc(100vh - 250px) !important; /* Ajustado para reducir el espacio */
   resize: none !important;
   box-sizing: border-box !important;
   display: block !important;
@@ -8,6 +8,7 @@
   background-color: transparent !important;
   font-size: 1rem !important;
   line-height: 1.5 !important;
+  padding: 0.5rem !important;
   margin-top: 0.5rem !important;
   padding: 0.5rem !important;
   width: 100% !important;
