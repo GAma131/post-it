@@ -7,12 +7,14 @@
   --background-rgb: 255, 255, 255;
 }
 
+/* Comentado para evitar el tema oscuro automático
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-rgb: 10, 10, 10;
   }
 }
+*/
 
 body {
   color: rgb(var(--foreground-rgb));
