@@ -136,22 +136,27 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
     if (contentLength < 50) {
       return {
         height: "160px",
+        bgClass: "bg-gray-300 dark:bg-gray-910", // XS - #D9D9D9 (claro) / #191F2A (oscuro)
       }; // XS - Menos de 50 caracteres
     } else if (contentLength >= 50 && contentLength <= 200) {
       return {
         height: "260px",
+        bgClass: "bg-gray-200 dark:bg-gray-905", // S - #E6E6E6 (claro) / #1D2430 (oscuro)
       }; // S - 50-200 caracteres
     } else if (contentLength > 200 && contentLength <= 500) {
       return {
         height: "360px",
+        bgClass: "bg-gray-100 dark:bg-gray-900", // M - #F2F2F2 (claro) / #212936 (oscuro)
       }; // M - 201-500 caracteres
     } else if (contentLength > 500 && contentLength <= 1000) {
       return {
         height: "460px",
+        bgClass: "bg-gray-50 dark:bg-gray-870", // L - #FFFFFF (claro) / #262E3C (oscuro)
       }; // L - 501-1000 caracteres
     } else {
       return {
         height: "560px",
+        bgClass: "bg-gray-400 dark:bg-gray-850", // XL - #B0B0B0 (claro) / #2B3442 (oscuro)
       }; // XL - Más de 1000 caracteres
     }
   };
@@ -221,11 +226,11 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
     }
   };
 
-  const { height } = getCardSize();
+  const { height, bgClass } = getCardSize();
 
   return (
     <div
-      className="rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+      className={`rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative ${bgClass} text-gray-800 dark:text-white`}
       style={{
         height,
         animation: `fadeIn 0.5s ease-in-out ${index * 0.05}s`,
@@ -242,7 +247,7 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
             {note.tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="text-xs bg-gray-150 dark:bg-gray-700 px-2 py-0.5 rounded-full"
+                className="text-xs bg-gray-400 bg-opacity-30 dark:bg-gray-600 px-2 py-0.5 rounded-full"
               >
                 {tag}
               </span>
