@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { apiUrl } from "../config/api";
+import { apiUrl } from "../../config/api";
 
 export default function PublishButton() {
   const [isLoading, setIsLoading] = useState(false);

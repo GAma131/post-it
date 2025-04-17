@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import MarkdownEditor from "./MarkdownEditor";
 import TagInput from "./TagInput";
 import PublishButton from "./PublishButton";
-import { STORAGE_KEYS } from "../hooks/useLocalStorage";
+import { STORAGE_KEYS } from "../../hooks/useLocalStorage";
 
 interface EditorFormProps {
   contenido: string;

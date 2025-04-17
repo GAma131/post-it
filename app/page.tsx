@@ -9,7 +9,7 @@ import { useTagManager } from "./hooks/useTagManager";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
 // Componentes
-import EditorForm from "./components/EditorForm";
+import EditorForm from "./components/principal/EditorForm";
 
 export default function Home() {
   const [titulo, setTitulo] = useState("");

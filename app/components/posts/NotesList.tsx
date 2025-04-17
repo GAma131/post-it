@@ -50,7 +50,7 @@ export default function NotesList({ notes, isLoading }: NotesListProps) {
         </p>
         <Link
           href="/"
-          className="inline-block bg-gray-800 dark:bg-white text-white dark:text-gray-800 px-4 py-2 rounded-md hover:bg-gray-900 dark:hover:bg-gray-100 transition"
+          className="inline-block bg-gray-800 dark:bg-white text-white dark:text-gray-800 px-4 py-2 hover:bg-gray-900 dark:hover:bg-gray-100 transition"
         >
           Crear tu primera nota
         </Link>

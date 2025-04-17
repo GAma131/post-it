@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "../Navbar/ThemeToggle";
 
 export default function Navbar() {
   return (
