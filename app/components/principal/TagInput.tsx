@@ -13,6 +13,8 @@ interface TagInputProps {
   showPreview: boolean;
   togglePreview: () => void;
   removeLastTag: () => void;
+  onCancel?: () => void;
+  isEditMode?: boolean;
 }
 
 // Interfaz para userAgentData con el método getHighEntropyValues
@@ -34,6 +36,8 @@ export default function TagInput({
   showPreview,
   togglePreview,
   removeLastTag,
+  onCancel,
+  isEditMode = false,
 }: TagInputProps) {
   const [modifierKey, setModifierKey] = useState<string>("⌘"); // Por defecto, mostrar el símbolo de Mac
 
@@ -113,6 +117,17 @@ export default function TagInput({
             Eliminar etiqueta {modifierKey}⌫
           </kbd>
         </button>
+        {isEditMode && onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+          >
+            <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              Cancelar edición {modifierKey}Delete
+            </kbd>
+          </button>
+        )}
       </div>
       {tags.map((tag) => (
         <div

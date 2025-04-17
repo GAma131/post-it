@@ -1,4 +1,6 @@
+"use client";
 import { Note } from "../../types/Note";
+import { useRouter } from "next/navigation";
 
 interface NoteCardProps {
   note: Note;
@@ -6,6 +8,39 @@ interface NoteCardProps {
 }
 
 export default function NoteCard({ note, index }: NoteCardProps) {
+  const router = useRouter();
+
+  // Determinamos el ID de la nota
+  const getNoteId = () => {
+    // Si tenemos _id como objeto con $oid
+    if (note._id && typeof note._id === "object" && "$oid" in note._id) {
+      return note._id.$oid;
+    }
+    // Si es directamente un string
+    if (note._id && typeof note._id === "string") {
+      return note._id;
+    }
+    return "";
+  };
+
+  // Manejador para redireccionar a la pantalla de edición
+  const handleEditNote = () => {
+    const noteId = getNoteId();
+    if (noteId) {
+      // Construimos el contenido completo de la nota como en el editor
+      const fullContent = `${note.title}\n${note.content}`;
+
+      // Redirigir a la página de edición con el ID y los datos de la nota
+      router.push(
+        `/edit/${noteId}?title=${encodeURIComponent(
+          note.title
+        )}&content=${encodeURIComponent(
+          note.content
+        )}&tags=${encodeURIComponent(JSON.stringify(note.tags))}`
+      );
+    }
+  };
+
   // Determinar el tamaño basado en el contenido
   const getCardSize = () => {
     // Calcular tamaño basado en longitud del contenido (solo texto) sin considerar saltos de línea
@@ -27,14 +62,9 @@ export default function NoteCard({ note, index }: NoteCardProps) {
         height: "360px",
         bgClass: "bg-gray-100 dark:bg-gray-900", // M - #F2F2F2 (claro) / #212936 (oscuro)
       }; // M - 201-500 caracteres
-    } else if (contentLength > 500 && contentLength <= 1000) {
-      return {
-        height: "460px",
-        bgClass: "bg-gray-50 dark:bg-gray-870", // L - #FFFFFF (claro) / #262E3C (oscuro)
-      }; // L - 501-1000 caracteres
     } else {
       return {
-        height: "560px",
+        height: "460px",
         bgClass: "bg-gray-400 dark:bg-gray-850", // XL - #B0B0B0 (claro) / #2B3442 (oscuro)
       }; // XL - Más de 1000 caracteres
     }
@@ -50,7 +80,6 @@ export default function NoteCard({ note, index }: NoteCardProps) {
       "260px": 190, // S - Mostrar mayoría (hasta 200 chars)
       "360px": 460, // M - Mostrar gran parte (hasta 500 chars)
       "460px": 1000, // L - Mostrar mayoría (hasta 1000 chars)
-      "560px": 1600, // XL - Mostrar bastante (>1000 chars)
     };
 
     const maxLength = limits[height] || 200;
@@ -109,11 +138,12 @@ export default function NoteCard({ note, index }: NoteCardProps) {
 
   return (
     <div
-      className={`rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative ${bgClass} text-gray-800 dark:text-white`}
+      className={`rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative ${bgClass} text-gray-800 dark:text-white cursor-pointer`}
       style={{
         height,
         animation: `fadeIn 0.5s ease-in-out ${index * 0.05}s`,
       }}
+      onClick={handleEditNote}
     >
       {/* Contenido de la nota */}
       <div className="mb-2 overflow-hidden flex-grow">{renderContent()}</div>
