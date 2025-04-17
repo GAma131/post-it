@@ -12,6 +12,13 @@ import PublishButton from "./components/PublishButton";
 // Hooks
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
+// Claves para localStorage
+const STORAGE_KEYS = {
+  CONTENT: "post-it-content",
+  TAGS: "post-it-tags",
+  PREVIEW: "post-it-preview-mode",
+};
+
 export default function Home() {
   const [titulo, setTitulo] = useState("");
   const [contenido, setContenido] = useState("");
@@ -21,6 +28,58 @@ export default function Home() {
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Cargar datos guardados de localStorage al cargar la página
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        // Cargar contenido guardado
+        const savedContent = localStorage.getItem(STORAGE_KEYS.CONTENT);
+        if (savedContent) {
+          setContenido(savedContent);
+        }
+
+        // Cargar etiquetas guardadas
+        const savedTags = localStorage.getItem(STORAGE_KEYS.TAGS);
+        if (savedTags) {
+          setTags(JSON.parse(savedTags));
+        }
+
+        // Cargar estado de vista previa
+        const savedPreviewMode = localStorage.getItem(STORAGE_KEYS.PREVIEW);
+        if (savedPreviewMode) {
+          setShowPreview(savedPreviewMode === "true");
+        }
+
+        setIsInitialLoad(false);
+      } catch (error) {
+        console.error("Error al cargar datos guardados:", error);
+        setIsInitialLoad(false);
+      }
+    }
+  }, []);
+
+  // Guardar contenido en localStorage cuando cambie
+  useEffect(() => {
+    if (!isInitialLoad && typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.CONTENT, contenido);
+    }
+  }, [contenido, isInitialLoad]);
+
+  // Guardar etiquetas en localStorage cuando cambien
+  useEffect(() => {
+    if (!isInitialLoad && typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.TAGS, JSON.stringify(tags));
+    }
+  }, [tags, isInitialLoad]);
+
+  // Guardar estado de vista previa
+  useEffect(() => {
+    if (!isInitialLoad && typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.PREVIEW, showPreview.toString());
+    }
+  }, [showPreview, isInitialLoad]);
 
   // Uso del hook personalizado para los atajos de teclado
   useKeyboardShortcuts([
@@ -44,10 +103,10 @@ export default function Home() {
 
   useEffect(() => {
     // Establecer el foco en el textarea al cargar la página
-    if (textareaRef.current) {
+    if (textareaRef.current && !showPreview) {
       textareaRef.current.focus();
     }
-  }, []);
+  }, [showPreview]);
 
   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTagInput(e.target.value);
@@ -92,7 +151,17 @@ export default function Home() {
     e.preventDefault();
     // Aquí iría la lógica para enviar el post
     console.log("Publicando:", { contenido, tags });
+
+    // Limpiar localStorage después de publicar exitosamente
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEYS.CONTENT);
+      localStorage.removeItem(STORAGE_KEYS.TAGS);
+    }
+
     alert("Post enviado con éxito");
+    // Redireccionar y resetear el estado
+    setContenido("");
+    setTags([]);
     // router.push("/posts");
   };
 
@@ -125,6 +194,9 @@ export default function Home() {
               onTagInputKeyDown={handleTagInputKeyDown}
               onTagRemove={removeTag}
               onTagInputBlur={handleTagInputBlur}
+              showPreview={showPreview}
+              togglePreview={() => setShowPreview(!showPreview)}
+              removeLastTag={removeLastTag}
             />
 
             <PublishButton />

@@ -9,7 +9,7 @@
 
 .dark {
   --foreground-rgb: 255, 255, 255;
-  --background-rgb: 31, 41, 55; /* el color es gray-800 */
+  --background-rgb: 33, 41, 54; /* Actualizado a nuestro color base #212936 */
 }
 
 body {
