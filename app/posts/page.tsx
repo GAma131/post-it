@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { apiUrl } from "../config/api";
 
 // Interfaz para documentos de MongoDB
 interface Note {
@@ -29,7 +30,7 @@ export default function Posts() {
     // Función para obtener las notas desde la API
     async function fetchNotes() {
       try {
-        const response = await axios.get("http://localhost:3000/api/notes");
+        const response = await axios.get(apiUrl("api/notes"));
         setNotes(response.data);
         console.log(notes);
       } catch (error) {

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { apiUrl } from "../config/api";
 
 export default function PublishButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +36,7 @@ export default function PublishButton() {
       });
 
       // Realizar la solicitud POST con axios
-      const response = await axios.post("http://localhost:3000/api/notes", {
+      const response = await axios.post(apiUrl("api/notes"), {
         title,
         content,
         tags,
