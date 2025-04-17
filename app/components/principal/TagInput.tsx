@@ -170,7 +170,7 @@ export default function TagInput({
           type="button"
           onClick={removeLastTag}
           disabled={tags.length === 0}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
             Eliminar etiqueta {modifierKey}⌫
@@ -179,7 +179,7 @@ export default function TagInput({
         <button
           type="button"
           onClick={togglePreview}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded"
         >
           <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
             {showPreview ? "Editar texto" : "Vista previa"} {modifierKey}E
@@ -190,7 +190,7 @@ export default function TagInput({
             type="button"
             onClick={onSaveOrReturn}
             disabled={isSaving}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded"
           >
             <kbd
               className={`
@@ -215,7 +215,7 @@ export default function TagInput({
             type="button"
             onClick={onPublish}
             disabled={isPublishing}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded"
           >
             <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
               {isPublishing ? "Guardando..." : `Guardar ${modifierKey}↵`}

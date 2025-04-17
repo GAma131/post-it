@@ -76,7 +76,7 @@ export default function EditNoteForm({
             textareaRef={textareaRef}
           />
 
-          <div className="flex flex-col mt-4">
+          <div className="flex flex-col mt-2">
             <TagInput
               tags={tags}
               tagInput={tagInput}

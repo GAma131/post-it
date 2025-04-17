@@ -28,7 +28,7 @@ export default function MarkdownEditor({
           className="full-textarea text-lg shadow-md dark:text-white dark:bg-gray-900"
         />
       ) : (
-        <div className="full-textarea markdown-preview prose prose-lg dark:prose-invert max-w-none">
+        <div className="full-textarea markdown-preview prose prose-lg shadow-md dark:prose-invert max-w-none">
           {value ? (
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
           ) : (
