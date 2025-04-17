@@ -18,6 +18,55 @@ body {
   transition: color 0.2s, background-color 0.2s;
 }
 
+/* Colores adicionales para tonos intermedios de gris */
+.bg-gray-150 {
+  background-color: rgb(243, 244, 246); /* Más claro que gray-200 */
+}
+
+.bg-gray-175 {
+  background-color: rgb(237, 238, 240); /* Entre gray-150 y gray-200 */
+}
+
+.bg-gray-250 {
+  background-color: rgb(228, 229, 231); /* Entre gray-200 y gray-300 */
+}
+
+/* Colores adicionales para el modo oscuro */
+.dark .bg-gray-650 {
+  background-color: rgb(75, 85, 99); /* Más claro que gray-700 */
+}
+
+.dark .bg-gray-750 {
+  background-color: rgb(55, 65, 81); /* Un poco más claro que gray-800 */
+}
+
+.dark .bg-gray-850 {
+  background-color: rgb(23, 29, 40); /* Un poco más oscuro que gray-800 */
+}
+
+/* Animación de entrada para las tarjetas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mejoras para el grid de tipo masonry */
+.masonry-grid {
+  display: grid;
+  grid-auto-flow: dense;
+}
+
+/* Clases para tamaños de grid */
+.row-span-3 {
+  grid-row: span 3 / span 3;
+}
+
 @layer base {
   .dark .prose {
     --tw-prose-body: rgb(229, 231, 235); /* gray-200 */
