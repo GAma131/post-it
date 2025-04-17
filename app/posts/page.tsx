@@ -137,7 +137,7 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
       return { rowSpan: 2, colSpan: 1, minHeight: "220px", order: randomOrder }; // L
     } else {
       console.log(`Nota ${index} asignada como XL`);
-      return { rowSpan: 3, colSpan: 2, minHeight: "270px", order: randomOrder }; // XL
+      return { rowSpan: 3, colSpan: 1, minHeight: "270px", order: randomOrder }; // XL
     }
   };
 
