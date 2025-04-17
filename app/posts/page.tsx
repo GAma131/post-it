@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { apiUrl } from "../config/api";
+import Masonry from "react-masonry-css";
 
 // Interfaz para documentos de MongoDB
 interface Note {
@@ -26,13 +27,33 @@ export default function Posts() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Puntos de quiebre para el diseño responsivo
+  const breakpointColumnsObj = {
+    default: 4, // Por defecto 4 columnas en pantallas grandes
+    1536: 4, // 4 columnas a partir de 1536px
+    1280: 3, // 3 columnas a partir de 1280px
+    1024: 3, // 3 columnas a partir de 1024px
+    768: 2, // 2 columnas a partir de 768px
+    640: 1, // 1 columna en móviles
+  };
+
   useEffect(() => {
     // Función para obtener las notas desde la API
     async function fetchNotes() {
       try {
         const response = await axios.get(apiUrl("api/notes"));
-        setNotes(response.data);
-        console.log(notes);
+
+        // Ordenar notas por longitud para mejor distribución
+        const sortedNotes = [...response.data].sort((a, b) => {
+          const lengthA = a.content.replace(/\n/g, "").length;
+          const lengthB = b.content.replace(/\n/g, "").length;
+          // Intentamos alternar entre notas grandes y pequeñas
+          if (lengthA > 500 && lengthB < 200) return -1;
+          if (lengthB > 500 && lengthA < 200) return 1;
+          return lengthB - lengthA; // Colocar notas más grandes primero
+        });
+
+        setNotes(sortedNotes);
       } catch (error) {
         console.error("Error fetching notes:", error);
       } finally {
@@ -56,43 +77,38 @@ export default function Posts() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 auto-rows-auto">
-          {[...Array(9)].map((_, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {[...Array(9)].map((_, i) => (
             <div
-              key={index}
+              key={i}
               className={`bg-gray-100 dark:bg-gray-800 rounded-lg p-6 animate-pulse ${
-                index % 5 === 0
+                i % 5 === 0
                   ? "h-28"
-                  : index % 5 === 1
+                  : i % 5 === 1
                   ? "h-40"
-                  : index % 5 === 2
+                  : i % 5 === 2
                   ? "h-52"
-                  : index % 5 === 3
+                  : i % 5 === 3
                   ? "h-64"
                   : "h-80"
               }`}
-              style={{
-                gridRow: `span ${
-                  index % 5 === 0
-                    ? 1
-                    : index % 5 === 1
-                    ? 1
-                    : index % 5 === 2
-                    ? 2
-                    : index % 5 === 3
-                    ? 2
-                    : 3
-                }`,
-              }}
             ></div>
           ))}
         </div>
       ) : notes.length > 0 ? (
-        <div className="masonry-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 auto-rows-auto">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-auto -ml-3" // Necesario para el layout
+          columnClassName="pl-3 bg-clip-padding" // Gap entre columnas
+        >
           {notes.map((note, index) => (
-            <NoteCard key={index} note={note} index={index} />
+            <div key={index} className="mb-3">
+              {" "}
+              {/* Espaciado vertical entre tarjetas */}
+              <NoteCard note={note} index={index} />
+            </div>
           ))}
-        </div>
+        </Masonry>
       ) : (
         <div className="text-center py-20 border border-gray-200 dark:border-gray-700 rounded-lg">
           <p className="text-gray-500 dark:text-gray-400 mb-4">
@@ -111,53 +127,93 @@ export default function Posts() {
 }
 
 function NoteCard({ note, index }: { note: Note; index: number }) {
-  // Determinar el tamaño y la posición en base al contenido
-  const getGridSpan = () => {
+  // Determinar el tamaño basado en el contenido
+  const getCardSize = () => {
     // Calcular tamaño basado en longitud del contenido (solo texto) sin considerar saltos de línea
     const contentLength = note.content.replace(/\n/g, "").length;
-    // Usar el índice en lugar del ID para el orden aleatorio pero consistente
-    const randomOrder = index % 10;
 
-    // Debugging
-    console.log(
-      `Nota ${index}: "${note.title}" - Longitud: ${contentLength} caracteres`
-    );
-
-    // Tamaños basados en rangos precisos de longitud
-    if (contentLength <= 30) {
-      console.log(`Nota ${index} asignada como XS`);
-      return { rowSpan: 1, colSpan: 1, minHeight: "110px", order: randomOrder }; // XS
-    } else if (contentLength > 30 && contentLength <= 100) {
-      console.log(`Nota ${index} asignada como S`);
-      return { rowSpan: 1, colSpan: 1, minHeight: "150px", order: randomOrder }; // S
-    } else if (contentLength > 100 && contentLength <= 200) {
-      console.log(`Nota ${index} asignada como M`);
-      return { rowSpan: 2, colSpan: 1, minHeight: "200px", order: randomOrder }; // M
-    } else if (contentLength > 200 && contentLength <= 350) {
-      console.log(`Nota ${index} asignada como L`);
-      return { rowSpan: 2, colSpan: 1, minHeight: "220px", order: randomOrder }; // L
+    // Rangos ajustados según la especificación del usuario
+    if (contentLength < 50) {
+      return {
+        height: "160px",
+      }; // XS - Menos de 50 caracteres
+    } else if (contentLength >= 50 && contentLength <= 200) {
+      return {
+        height: "260px",
+      }; // S - 50-200 caracteres
+    } else if (contentLength > 200 && contentLength <= 500) {
+      return {
+        height: "360px",
+      }; // M - 201-500 caracteres
+    } else if (contentLength > 500 && contentLength <= 1000) {
+      return {
+        height: "460px",
+      }; // L - 501-1000 caracteres
     } else {
-      console.log(`Nota ${index} asignada como XL`);
-      return { rowSpan: 3, colSpan: 1, minHeight: "270px", order: randomOrder }; // XL
+      return {
+        height: "560px",
+      }; // XL - Más de 1000 caracteres
     }
   };
 
-  // Clases para la tarjeta (simplificado)
-  const getCardClasses = () => {
-    const { rowSpan, colSpan } = getGridSpan();
-    const baseClasses =
-      "rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative bg-white dark:bg-gray-800 text-gray-800 dark:text-white";
+  // Truncar contenido según tamaño de tarjeta
+  const truncateContent = (content: string) => {
+    const { height } = getCardSize();
 
-    // Estilos para grid
-    return `${baseClasses} ${rowSpan > 1 ? `row-span-${rowSpan}` : ""} ${
-      colSpan > 1 ? `col-span-${colSpan}` : ""
-    }`;
+    // Ajustar límites de caracteres según el tamaño de la tarjeta
+    const limits: Record<string, number> = {
+      "160px": 60, // XS - Mostrar casi todo (<50 chars)
+      "260px": 190, // S - Mostrar mayoría (hasta 200 chars)
+      "360px": 460, // M - Mostrar gran parte (hasta 500 chars)
+      "460px": 1000, // L - Mostrar mayoría (hasta 1000 chars)
+      "560px": 1600, // XL - Mostrar bastante (>1000 chars)
+    };
+
+    const maxLength = limits[height] || 200;
+
+    // Asegurar que siempre se trunca, independientemente del tamaño
+    if (content.length <= maxLength) {
+      return content;
+    }
+    return content.slice(0, maxLength) + "...";
+  };
+
+  // Renderizar contenido
+  const renderContent = () => {
+    // Siempre truncar, incluso con saltos de línea
+    const truncatedContent = truncateContent(note.content);
+    const { height } = getCardSize();
+
+    // Ajustar el número de líneas según la altura de la tarjeta
+    const lineClampClasses: Record<string, string> = {
+      "160px": "line-clamp-4", // XS - 4 líneas
+      "260px": "line-clamp-8", // S - 8 líneas
+      "360px": "line-clamp-12", // M - 12 líneas
+      "460px": "line-clamp-16", // L - 16 líneas
+      "560px": "line-clamp-20", // XL - 20 líneas
+    };
+
+    const lineClamp = lineClampClasses[height] || "line-clamp-6";
+
+    return (
+      <>
+        <h3 className="text-lg font-medium mb-2">{note.title}</h3>
+        <div className={`${lineClamp} overflow-hidden`}>
+          {truncatedContent.includes("\n")
+            ? truncatedContent.split("\n").map((line, idx) => (
+                <div key={idx} className="mb-1">
+                  {line}
+                </div>
+              ))
+            : truncatedContent}
+        </div>
+      </>
+    );
   };
 
   // Formatear fecha
   const formatDate = (date: string) => {
     try {
-      // Extraer solo la parte de la fecha (antes de la T)
       return date.split("T")[0];
     } catch (error) {
       console.error("Error formatting date:", error);
@@ -165,78 +221,40 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
     }
   };
 
-  // Truncar contenido según dimensión
-  const truncateContent = (content: string) => {
-    const { rowSpan, colSpan } = getGridSpan();
-    const baseLength = 80;
-    const maxLength = Math.floor(
-      baseLength *
-        (rowSpan === 1 ? 1 : rowSpan === 2 ? 3 : 5) *
-        (colSpan === 1 ? 1 : 1.8)
-    );
-
-    if (content.length <= maxLength) return content;
-    return content.slice(0, maxLength) + "...";
-  };
-
-  // Renderizar contenido según formato
-  const renderContent = () => {
-    // Contenido con formato de lista (con saltos de línea)
-    if (note.content.includes("\n")) {
-      return (
-        <>
-          <h3 className="text-lg font-medium mb-1">{note.title}</h3>
-          <div>
-            {note.content.split("\n").map((line, idx) => (
-              <div key={idx} className="mb-1">
-                {line}
-              </div>
-            ))}
-          </div>
-        </>
-      );
-    }
-
-    // Contenido normal
-    return (
-      <>
-        <h3 className="text-lg font-medium mb-1">{note.title}</h3>
-        <div>{truncateContent(note.content)}</div>
-      </>
-    );
-  };
-
-  const { minHeight, order } = getGridSpan();
+  const { height } = getCardSize();
 
   return (
     <div
-      className={getCardClasses()}
+      className="rounded-lg p-4 shadow-md dark:shadow-xl transition-transform hover:scale-[1.02] overflow-hidden flex flex-col relative bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
       style={{
-        minHeight,
-        order,
+        height,
         animation: `fadeIn 0.5s ease-in-out ${index * 0.05}s`,
       }}
     >
       {/* Contenido de la nota */}
-      <div className="mb-2">{renderContent()}</div>
+      <div className="mb-2 overflow-hidden flex-grow">{renderContent()}</div>
 
-      {/* Etiquetas */}
-      {note.tags.length > 0 && (
-        <div className="mt-auto pt-3 flex flex-wrap gap-1">
-          {note.tags.map((tag, idx) => (
-            <span
-              key={idx}
-              className="text-xs bg-gray-150 dark:bg-gray-700 px-2 py-0.5 rounded-full"
-            >
-              {tag}
-            </span>
-          ))}
+      {/* Etiquetas y fecha en el footer (siempre abajo) */}
+      <div className="mt-auto">
+        {/* Etiquetas */}
+        {note.tags.length > 0 && (
+          <div className="pt-3 flex flex-wrap gap-1">
+            {note.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="text-xs bg-gray-150 dark:bg-gray-700 px-2 py-0.5 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Fecha */}
+        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {/* @ts-ignore */}
+          {formatDate(note.createdAt)}
         </div>
-      )}
-
-      {/* Fecha */}
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-        {formatDate(note.createdAt.$date)}
       </div>
     </div>
   );
