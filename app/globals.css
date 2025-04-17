@@ -7,14 +7,83 @@
   --background-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 10, 10, 10;
-  }
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 33, 41, 54; /* Actualizado a nuestro color base #212936 */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  transition: color 0.2s, background-color 0.2s;
+}
+
+/* Colores adicionales para tonos intermedios de gris */
+.bg-gray-150 {
+  background-color: rgb(243, 244, 246); /* Más claro que gray-200 */
+}
+
+.bg-gray-175 {
+  background-color: rgb(237, 238, 240); /* Entre gray-150 y gray-200 */
+}
+
+.bg-gray-250 {
+  background-color: rgb(228, 229, 231); /* Entre gray-200 y gray-300 */
+}
+
+/* Colores adicionales para el modo oscuro */
+.dark .bg-gray-650 {
+  background-color: rgb(75, 85, 99); /* Más claro que gray-700 */
+}
+
+.dark .bg-gray-750 {
+  background-color: rgb(55, 65, 81); /* Un poco más claro que gray-800 */
+}
+
+.dark .bg-gray-850 {
+  background-color: rgb(23, 29, 40); /* Un poco más oscuro que gray-800 */
+}
+
+/* Animación de entrada para las tarjetas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mejoras para el grid de tipo masonry */
+.masonry-grid {
+  display: grid;
+  grid-auto-flow: dense;
+}
+
+/* Clases para tamaños de grid */
+.row-span-3 {
+  grid-row: span 3 / span 3;
+}
+
+@layer base {
+  .dark .prose {
+    --tw-prose-body: rgb(229, 231, 235); /* gray-200 */
+    --tw-prose-headings: rgb(255, 255, 255);
+    --tw-prose-lead: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-links: rgb(147, 197, 253); /* blue-300 */
+    --tw-prose-bold: rgb(255, 255, 255);
+    --tw-prose-counters: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-bullets: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-hr: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-quotes: rgb(255, 255, 255);
+    --tw-prose-quote-borders: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-captions: rgb(156, 163, 175); /* gray-400 */
+    --tw-prose-code: rgb(255, 255, 255);
+    --tw-prose-pre-code: rgb(209, 213, 219);
+    --tw-prose-pre-bg: rgb(31, 41, 55); /* gray-800 */
+    --tw-prose-th-borders: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-td-borders: rgb(55, 65, 81); /* gray-700 */
+  }
 }
