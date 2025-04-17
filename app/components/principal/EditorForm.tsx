@@ -1,9 +1,10 @@
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownEditor from "./MarkdownEditor";
 import TagInput from "./TagInput";
-import PublishButton from "./PublishButton";
 import { STORAGE_KEYS } from "../../hooks/useLocalStorage";
+import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 interface EditorFormProps {
   contenido: string;
@@ -39,27 +40,40 @@ export default function EditorForm({
   clearStorage,
 }: EditorFormProps) {
   const router = useRouter();
+  const [isPublishing, setIsPublishing] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Aquí iría la lógica para enviar el post
-    console.log("Publicando:", { contenido, tags });
+  const handlePublish = async () => {
+    setIsPublishing(true);
 
-    // Limpiar localStorage después de publicar exitosamente
-    clearStorage();
+    try {
+      // Separar la primera línea como título y el resto como contenido
+      const lines = contenido.split("\n");
+      const title = lines[0] || "";
+      const content = lines.slice(1).join("\n").trim();
 
-    alert("Post enviado con éxito");
-    // Redireccionar y resetear el estado
-    setContenido("");
-    // router.push("/posts");
+      // Realizar la solicitud POST con axios
+      const response = await axios.post(apiUrl("api/notes"), {
+        title,
+        content,
+        tags,
+      });
+
+      // Limpiar localStorage después de publicar exitosamente
+      clearStorage();
+
+      // Redirigir a la pantalla de posts
+      router.push("/posts");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("No se pudo publicar la nota");
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col items-center">
-      <form
-        className="flex flex-col pt-1 px-6 w-full max-w-7xl mx-auto"
-        onSubmit={handleSubmit}
-      >
+      <div className="flex flex-col pt-1 px-6 w-full max-w-7xl mx-auto">
         <div className="editor-container">
           <MarkdownEditor
             value={contenido}
@@ -80,12 +94,13 @@ export default function EditorForm({
               showPreview={showPreview}
               togglePreview={() => setShowPreview(!showPreview)}
               removeLastTag={removeLastTag}
+              onPublish={handlePublish}
+              isPublishing={isPublishing}
+              isCreateMode={true}
             />
-
-            <PublishButton />
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

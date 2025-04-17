@@ -18,8 +18,8 @@ export default function EditNote({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
 
   // Obtener datos de la URL
-  const title = searchParams.get("title") || "";
-  const content = searchParams.get("content") || "";
+  const initialTitle = searchParams.get("title") || "";
+  const initialContent = searchParams.get("content") || "";
   const tagsParam = searchParams.get("tags") || "[]";
 
   // Parsear las etiquetas desde la URL
@@ -31,11 +31,13 @@ export default function EditNote({ params }: { params: { id: string } }) {
   }
 
   // Estado para la edición
-  const [contenido, setContenido] = useState(`${title}\n${content}`);
+  const initialValue = `${initialTitle}\n${initialContent}`;
+  const [contenido, setContenido] = useState(initialValue);
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>(initialTags);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModified, setIsModified] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +50,20 @@ export default function EditNote({ params }: { params: { id: string } }) {
     setTagInput,
     setTags,
   });
+
+  // Detectar cambios en el contenido o etiquetas
+  useEffect(() => {
+    // Verificar si el contenido o las etiquetas han cambiado
+    const contentChanged = contenido !== initialValue;
+
+    // Para verificar cambios en las etiquetas necesitamos comparar arrays
+    const tagsChanged =
+      initialTags.length !== tags.length ||
+      !initialTags.every((tag) => tags.includes(tag)) ||
+      !tags.every((tag) => initialTags.includes(tag));
+
+    setIsModified(contentChanged || tagsChanged);
+  }, [contenido, tags, initialValue, initialTags]);
 
   // Uso del hook personalizado para los atajos de teclado
   useKeyboardShortcuts([
@@ -69,8 +85,15 @@ export default function EditNote({ params }: { params: { id: string } }) {
     },
   ]);
 
-  // Función para actualizar la nota
-  const updateNote = async () => {
+  // Función para manejar el botón de guardar o volver
+  const handleSaveOrReturn = async () => {
+    // Si no hay cambios, simplemente volver a la lista de posts
+    if (!isModified) {
+      router.push("/posts");
+      return;
+    }
+
+    // Si hay cambios, actualizar la nota
     setIsLoading(true);
 
     try {
@@ -79,12 +102,26 @@ export default function EditNote({ params }: { params: { id: string } }) {
       const updatedTitle = lines[0] || "";
       const updatedContent = lines.slice(1).join("\n").trim();
 
-      // Realizar la solicitud PUT con axios
-      await axios.put(apiUrl(`api/notes/${params.id}`), {
+      // Construir el payload exactamente con el formato requerido
+      const noteData = {
         title: updatedTitle,
         content: updatedContent,
-        tags,
+        tags: tags,
+      };
+
+      // URL de la API
+      const apiEndpoint = apiUrl(`api/notes/${params.id}`);
+
+      console.log("Actualizando nota:", {
+        url: apiEndpoint,
+        id: params.id,
+        data: noteData,
       });
+
+      // Realizar la solicitud PUT con axios
+      const response = await axios.put(apiEndpoint, noteData);
+
+      console.log("Respuesta de la API:", response.data);
 
       // Redirigir a la pantalla de posts tras actualización exitosa
       router.push("/posts");
@@ -97,7 +134,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
   };
 
   useEffect(() => {
-    // Establecer el foco en el textarea al cargar la página
+    // Establecer el foco en el textarea solo cuando estamos en modo edición
     if (textareaRef.current && !showPreview) {
       textareaRef.current.focus();
     }
@@ -118,8 +155,9 @@ export default function EditNote({ params }: { params: { id: string } }) {
       removeTag={tagManager.removeTag}
       handleTagInputBlur={tagManager.handleTagInputBlur}
       removeLastTag={tagManager.removeLastTag}
-      updateNote={updateNote}
+      updateNote={handleSaveOrReturn}
       isLoading={isLoading}
+      isModified={isModified}
     />
   );
 }

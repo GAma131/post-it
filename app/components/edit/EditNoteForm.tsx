@@ -2,7 +2,6 @@ import { RefObject, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownEditor from "../principal/MarkdownEditor";
 import TagInput from "../principal/TagInput";
-import UpdateButton from "./UpdateButton";
 
 interface EditNoteFormProps {
   contenido: string;
@@ -20,6 +19,7 @@ interface EditNoteFormProps {
   removeLastTag: () => void;
   updateNote: () => Promise<void>;
   isLoading: boolean;
+  isModified: boolean;
 }
 
 export default function EditNoteForm({
@@ -38,20 +38,16 @@ export default function EditNoteForm({
   removeLastTag,
   updateNote,
   isLoading,
+  isModified,
 }: EditNoteFormProps) {
   const router = useRouter();
-
-  // Función para cancelar la edición
-  const handleCancel = () => {
-    router.push("/posts");
-  };
 
   // Determinar la tecla modificadora según el sistema
   const isMac =
     typeof navigator !== "undefined" ? /Mac/.test(navigator.platform) : false;
   const modifierKey = isMac ? "⌘" : "Ctrl+";
 
-  // Agregar atajo de teclado para cancelar
+  // Agregar atajo de teclado para volver a la lista de notas
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Para macOS: Cmd+Delete, para otros: Ctrl+Delete
@@ -59,7 +55,7 @@ export default function EditNoteForm({
         event.key === "Delete" &&
         ((isMac && event.metaKey) || (!isMac && event.ctrlKey))
       ) {
-        handleCancel();
+        router.push("/posts");
       }
     };
 
@@ -67,7 +63,7 @@ export default function EditNoteForm({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isMac]);
+  }, [isMac, router]);
 
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col items-center">
@@ -92,11 +88,10 @@ export default function EditNoteForm({
               showPreview={showPreview}
               togglePreview={() => setShowPreview(!showPreview)}
               removeLastTag={removeLastTag}
-              onCancel={handleCancel}
-              isEditMode={true}
+              onSaveOrReturn={updateNote}
+              isSaving={isLoading}
+              isModified={isModified}
             />
-
-            <UpdateButton updateNote={updateNote} isLoading={isLoading} />
           </div>
         </div>
       </div>

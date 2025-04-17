@@ -13,8 +13,12 @@ interface TagInputProps {
   showPreview: boolean;
   togglePreview: () => void;
   removeLastTag: () => void;
-  onCancel?: () => void;
-  isEditMode?: boolean;
+  onSaveOrReturn?: () => Promise<void>;
+  isSaving?: boolean;
+  isModified?: boolean;
+  onPublish?: () => Promise<void>;
+  isPublishing?: boolean;
+  isCreateMode?: boolean;
 }
 
 // Interfaz para userAgentData con el método getHighEntropyValues
@@ -36,8 +40,12 @@ export default function TagInput({
   showPreview,
   togglePreview,
   removeLastTag,
-  onCancel,
-  isEditMode = false,
+  onSaveOrReturn,
+  isSaving = false,
+  isModified = false,
+  onPublish,
+  isPublishing = false,
+  isCreateMode = false,
 }: TagInputProps) {
   const [modifierKey, setModifierKey] = useState<string>("⌘"); // Por defecto, mostrar el símbolo de Mac
 
@@ -95,40 +103,43 @@ export default function TagInput({
     detectOS();
   }, []);
 
+  // Atajo de teclado Cmd+Enter o Ctrl+Enter para guardar/volver
+  useEffect(() => {
+    if (!onSaveOrReturn && !onPublish) return; // Solo si tenemos función de guardar/volver o publicar
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isMac = modifierKey === "⌘";
+
+      // Para macOS: Cmd+Enter, para otros: Ctrl+Enter
+      if (
+        event.key === "Enter" &&
+        ((isMac && event.metaKey) || (!isMac && event.ctrlKey))
+      ) {
+        event.preventDefault();
+
+        if (isCreateMode && onPublish && !isPublishing) {
+          onPublish();
+        } else if (onSaveOrReturn && !isSaving) {
+          onSaveOrReturn();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    modifierKey,
+    onSaveOrReturn,
+    isSaving,
+    onPublish,
+    isPublishing,
+    isCreateMode,
+  ]);
+
   return (
     <div className="flex flex-wrap gap-2 mb-2">
-      <div className="w-full flex justify-center gap-3">
-        <button
-          type="button"
-          onClick={togglePreview}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
-        >
-          <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-            {showPreview ? "Editar texto" : "Vista previa"} {modifierKey}E
-          </kbd>
-        </button>
-        <button
-          type="button"
-          onClick={removeLastTag}
-          disabled={tags.length === 0}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-            Eliminar etiqueta {modifierKey}⌫
-          </kbd>
-        </button>
-        {isEditMode && onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
-          >
-            <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-              Cancelar edición {modifierKey}Delete
-            </kbd>
-          </button>
-        )}
-      </div>
       {tags.map((tag) => (
         <div
           key={tag}
@@ -154,6 +165,64 @@ export default function TagInput({
         placeholder="✎ Etiquetas |"
         className="w-auto py-2 px-3 rounded-md text-md outline-none text-right ml-auto transition-colors dark:bg-gray-800 dark:text-white"
       />
+      <div className="w-full flex justify-end gap-5">
+        <button
+          type="button"
+          onClick={removeLastTag}
+          disabled={tags.length === 0}
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+            Eliminar etiqueta {modifierKey}⌫
+          </kbd>
+        </button>
+        <button
+          type="button"
+          onClick={togglePreview}
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+        >
+          <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+            {showPreview ? "Editar texto" : "Vista previa"} {modifierKey}E
+          </kbd>
+        </button>
+        {onSaveOrReturn && (
+          <button
+            type="button"
+            onClick={onSaveOrReturn}
+            disabled={isSaving}
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+          >
+            <kbd
+              className={`
+              px-1.5 py-0.5 rounded transition-colors
+              ${
+                isModified
+                  ? "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500"
+              }
+            `}
+            >
+              {isSaving
+                ? "Guardando..."
+                : isModified
+                ? `Guardar cambios ${modifierKey}↵`
+                : `Volver a notas ${modifierKey}↵`}
+            </kbd>
+          </button>
+        )}
+        {isCreateMode && onPublish && (
+          <button
+            type="button"
+            onClick={onPublish}
+            disabled={isPublishing}
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+          >
+            <kbd className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              {isPublishing ? "Guardando..." : `Guardar ${modifierKey}↵`}
+            </kbd>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
