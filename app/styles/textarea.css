@@ -30,6 +30,11 @@
   border-radius: 0.375rem !important;
 }
 
+.dark .markdown-preview {
+  background-color: #1f2937 !important; /* gray-800 */
+  color: white !important;
+}
+
 /* Estilos para el sistema de etiquetas */
 .tag {
   display: inline-flex;
@@ -43,8 +48,17 @@
   transition: all 0.2s;
 }
 
+.dark .tag {
+  background-color: #374151; /* gray-700 */
+  color: #e5e7eb; /* gray-200 */
+}
+
 .tag:hover {
   background-color: #e5e7eb;
+}
+
+.dark .tag:hover {
+  background-color: #4b5563; /* gray-600 */
 }
 
 .tag-remove {

@@ -7,16 +7,34 @@
   --background-rgb: 255, 255, 255;
 }
 
-/* Comentado para evitar el tema oscuro automático
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 10, 10, 10;
-  }
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 31, 41, 55; /* el color es gray-800 */
 }
-*/
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  transition: color 0.2s, background-color 0.2s;
+}
+
+@layer base {
+  .dark .prose {
+    --tw-prose-body: rgb(229, 231, 235); /* gray-200 */
+    --tw-prose-headings: rgb(255, 255, 255);
+    --tw-prose-lead: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-links: rgb(147, 197, 253); /* blue-300 */
+    --tw-prose-bold: rgb(255, 255, 255);
+    --tw-prose-counters: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-bullets: rgb(209, 213, 219); /* gray-300 */
+    --tw-prose-hr: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-quotes: rgb(255, 255, 255);
+    --tw-prose-quote-borders: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-captions: rgb(156, 163, 175); /* gray-400 */
+    --tw-prose-code: rgb(255, 255, 255);
+    --tw-prose-pre-code: rgb(209, 213, 219);
+    --tw-prose-pre-bg: rgb(31, 41, 55); /* gray-800 */
+    --tw-prose-th-borders: rgb(75, 85, 99); /* gray-600 */
+    --tw-prose-td-borders: rgb(55, 65, 81); /* gray-700 */
+  }
 }

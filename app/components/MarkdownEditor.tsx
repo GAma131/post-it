@@ -25,18 +25,18 @@ export default function MarkdownEditor({
           placeholder="Escribe en Markdown..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="full-textarea text-lg shadow-md scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300"
+          className="full-textarea text-lg shadow-md dark:shadow-2xl scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-300 dark:hover:scrollbar-thumb-gray-600 dark:text-white dark:bg-gray-800"
           style={{
             scrollbarWidth: "thin",
-            scrollbarColor: "#E5E7EB transparent",
+            scrollbarColor: "var(--scrollbar-color, #E5E7EB transparent)",
           }}
         />
       ) : (
-        <div className="full-textarea overflow-auto shadow-md p-6 bg-white prose prose-lg max-w-none">
+        <div className="full-textarea overflow-auto shadow-md dark:shadow-xl p-6 bg-white dark:bg-gray-800 prose prose-lg dark:prose-invert max-w-none">
           {value ? (
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
           ) : (
-            <p className="text-gray-400 italic">
+            <p className="text-gray-400 dark:text-gray-500 italic">
               La vista previa aparecerá aquí...
             </p>
           )}
