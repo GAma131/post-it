@@ -235,7 +235,7 @@ function NoteCard({ note, index }: { note: Note; index: number }) {
 
       {/* Fecha */}
       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-        {formatDate(note.createdAt)}
+        {formatDate(note.createdAt.$date)}
       </div>
     </div>
   );
