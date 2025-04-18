@@ -1,6 +1,9 @@
 "use client";
 import { Note } from "../../types/Note";
 import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 interface NoteCardProps {
   note: Note;
@@ -9,6 +12,8 @@ interface NoteCardProps {
 
 export default function NoteCard({ note, index }: NoteCardProps) {
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Determinamos el ID de la nota
   const getNoteId = () => {
@@ -23,8 +28,27 @@ export default function NoteCard({ note, index }: NoteCardProps) {
     return "";
   };
 
+  // Cierra el menú cuando se hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Manejador para redireccionar a la pantalla de edición
-  const handleEditNote = () => {
+  const handleEditNote = (e?: React.MouseEvent) => {
+    // Si el evento viene de un botón dentro del menú, no propagar
+    if (e && (e.target as HTMLElement).closest(".menu-button")) {
+      return;
+    }
+
     const noteId = getNoteId();
     if (noteId) {
       // Construimos el contenido completo de la nota como en el editor
@@ -39,6 +63,35 @@ export default function NoteCard({ note, index }: NoteCardProps) {
         )}&tags=${encodeURIComponent(JSON.stringify(note.tags))}`
       );
     }
+  };
+
+  // Manejador para eliminar la nota
+  const handleDeleteNote = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+
+    const noteId = getNoteId();
+    if (!noteId) return;
+
+    try {
+      // Usar apiUrl para construir la URL completa a la API externa
+      const response = await axios.post(apiUrl(`api/notes/delete/${noteId}`));
+
+      if (response.status === 200) {
+        // Forzar recarga de la página para asegurar la actualización completa
+        window.location.href = "/posts";
+      } else {
+        console.error("Error al eliminar la nota: respuesta no exitosa");
+      }
+    } catch (error) {
+      console.error("Error al eliminar la nota:", error);
+    }
+  };
+
+  // Manejador para abrir/cerrar el menú
+  const handleToggleMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(!menuOpen);
   };
 
   // Determinar el tamaño basado en el contenido
@@ -180,10 +233,49 @@ export default function NoteCard({ note, index }: NoteCardProps) {
           </div>
         )}
 
-        {/* Fecha */}
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          {/* @ts-ignore */}
-          {formatDate(note.createdAt)}
+        {/* Footer con fecha y botón de menú */}
+        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex justify-between items-center">
+          {/* Fecha */}
+          <div>
+            {/* @ts-ignore */}
+            {formatDate(note.createdAt)}
+          </div>
+
+          {/* Botón de tres puntos y menú desplegable */}
+          <div className="relative" ref={menuRef}>
+            <button
+              className="menu-button p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              onClick={handleToggleMenu}
+              aria-label="Opciones de nota"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="12" cy="5" r="1" />
+                <circle cx="12" cy="19" r="1" />
+              </svg>
+            </button>
+
+            {menuOpen && (
+              <div className="absolute z-10 right-0 bottom-8 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1">
+                <button
+                  className="menu-button w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={handleDeleteNote}
+                >
+                  Eliminar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

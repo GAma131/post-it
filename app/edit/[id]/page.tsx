@@ -110,7 +110,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
       };
 
       // URL de la API
-      const apiEndpoint = apiUrl(`api/notes/${params.id}`);
+      const apiEndpoint = apiUrl(`api/notes/update/${params.id}`);
 
       console.log("Actualizando nota:", {
         url: apiEndpoint,
@@ -119,7 +119,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
       });
 
       // Realizar la solicitud PUT con axios
-      const response = await axios.put(apiEndpoint, noteData);
+      const response = await axios.post(apiEndpoint, noteData);
 
       console.log("Respuesta de la API:", response.data);
 
