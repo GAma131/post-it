@@ -18,7 +18,7 @@ module.exports = {
           905: "#1D2430", // +5% oscuridad
           900: "#212936", // Color base
           870: "#262E3C", // -5% claridad
-          850: "#2B3442", // -10% claridad
+          850: "#232B36", // -10% claridad
           // Nueva escala de grises personalizada - tema claro
           50: "#FFFFFF", // Color base (blanco)
           100: "#F2F2F2", // -5% luminosidad

@@ -14,6 +14,7 @@ export default function NoteCard({ note, index }: NoteCardProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Determinamos el ID de la nota
   const getNoteId = () => {
@@ -41,6 +42,29 @@ export default function NoteCard({ note, index }: NoteCardProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Efecto para manejar el temporizador de cierre automático del menú
+  useEffect(() => {
+    // Si el menú está abierto, configurar un temporizador para cerrarlo después de 3 segundos
+    if (menuOpen) {
+      // Limpiar cualquier temporizador existente
+      if (menuTimerRef.current) {
+        clearTimeout(menuTimerRef.current);
+      }
+
+      // Crear nuevo temporizador
+      menuTimerRef.current = setTimeout(() => {
+        setMenuOpen(false);
+      }, 3000); // 3 segundos
+    }
+
+    // Función de limpieza para limpiar el temporizador cuando el componente se desmonta
+    return () => {
+      if (menuTimerRef.current) {
+        clearTimeout(menuTimerRef.current);
+      }
+    };
+  }, [menuOpen]);
 
   // Manejador para redireccionar a la pantalla de edición
   const handleEditNote = (e?: React.MouseEvent) => {
@@ -268,7 +292,7 @@ export default function NoteCard({ note, index }: NoteCardProps) {
             {menuOpen && (
               <div className="absolute z-10 right-0 bottom-8 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1">
                 <button
-                  className="menu-button w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full px-3 py-1.5 text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                   onClick={handleDeleteNote}
                 >
                   Eliminar

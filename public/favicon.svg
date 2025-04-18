@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Favicon minimalista de Post-it -->
+  <g>
+    <!-- Letra P minimalista -->
+    <path d="M10 8 L10 24 L13 24 L13 18 L20 18 C20 18 23 18 23 13 C23 8 20 8 20 8 Z" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+
+    <!-- Líneas que simulan una lista -->
+    <line x1="15" y1="11" x2="20" y2="11" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="15" y1="15" x2="20" y2="15" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Líneas adicionales debajo de la P -->
+    <line x1="15" y1="21" x2="22" y2="21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="15" y1="24" x2="20" y2="24" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <style>
+    @media (prefers-color-scheme: light) {
+      path, line { stroke: #000000; }
+    }
+    @media (prefers-color-scheme: dark) {
+      path, line { stroke: #FFFFFF; }
+    }
+  </style>
+</svg>
