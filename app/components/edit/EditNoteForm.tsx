@@ -1,12 +1,9 @@
-import { RefObject, useState } from "react";
+import { RefObject, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import MarkdownEditor from "./MarkdownEditor";
-import TagInput from "./TagInput";
-import { STORAGE_KEYS } from "../../hooks/useLocalStorage";
-import axios from "axios";
-import { apiUrl } from "../../config/api";
+import MarkdownEditor from "../principal/MarkdownEditor";
+import TagInput from "../principal/TagInput";
 
-interface EditorFormProps {
+interface EditNoteFormProps {
   contenido: string;
   setContenido: (content: string) => void;
   tags: string[];
@@ -20,10 +17,12 @@ interface EditorFormProps {
   removeTag: (tag: string) => void;
   handleTagInputBlur: () => void;
   removeLastTag: () => void;
-  clearStorage: () => void;
+  updateNote: () => Promise<void>;
+  isLoading: boolean;
+  isModified: boolean;
 }
 
-export default function EditorForm({
+export default function EditNoteForm({
   contenido,
   setContenido,
   tags,
@@ -37,39 +36,34 @@ export default function EditorForm({
   removeTag,
   handleTagInputBlur,
   removeLastTag,
-  clearStorage,
-}: EditorFormProps) {
+  updateNote,
+  isLoading,
+  isModified,
+}: EditNoteFormProps) {
   const router = useRouter();
-  const [isPublishing, setIsPublishing] = useState(false);
 
-  const handlePublish = async () => {
-    setIsPublishing(true);
+  // Determinar la tecla modificadora según el sistema
+  const isMac =
+    typeof navigator !== "undefined" ? /Mac/.test(navigator.platform) : false;
+  const modifierKey = isMac ? "⌘" : "Ctrl+";
 
-    try {
-      // Separar la primera línea como título y el resto como contenido
-      const lines = contenido.split("\n");
-      const title = lines[0] || "";
-      const content = lines.slice(1).join("\n").trim();
+  // Agregar atajo de teclado para volver a la lista de notas
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Para macOS: Cmd+Delete, para otros: Ctrl+Delete
+      if (
+        event.key === "Delete" &&
+        ((isMac && event.metaKey) || (!isMac && event.ctrlKey))
+      ) {
+        router.push("/posts");
+      }
+    };
 
-      // Realizar la solicitud POST con axios
-      const response = await axios.post(apiUrl("api/notes"), {
-        title,
-        content,
-        tags,
-      });
-
-      // Limpiar localStorage después de publicar exitosamente
-      clearStorage();
-
-      // Redirigir a la pantalla de posts
-      router.push("/posts");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("No se pudo publicar la nota");
-    } finally {
-      setIsPublishing(false);
-    }
-  };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMac, router]);
 
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col items-center">
@@ -94,9 +88,9 @@ export default function EditorForm({
               showPreview={showPreview}
               togglePreview={() => setShowPreview(!showPreview)}
               removeLastTag={removeLastTag}
-              onPublish={handlePublish}
-              isPublishing={isPublishing}
-              isCreateMode={true}
+              onSaveOrReturn={updateNote}
+              isSaving={isLoading}
+              isModified={isModified}
             />
           </div>
         </div>

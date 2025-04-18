@@ -1,14 +1,14 @@
 /* Media query para dispositivos móviles */
 @media (max-width: 768px) {
   .full-textarea {
-    height: calc(100vh - 245px) !important; /* Altura para móviles */
+    height: calc(100vh - 170px) !important; /* Altura para móviles */
   }
 }
 
 /* Media query para pantallas más grandes */
 @media (min-width: 769px) {
   .full-textarea {
-    height: calc(100vh - 215px) !important; /* Altura para escritorio */
+    height: calc(100vh - 170px) !important; /* Altura para escritorio */
   }
 }
 
